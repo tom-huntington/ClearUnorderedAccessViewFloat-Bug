@@ -860,7 +860,13 @@ void D3D12nBodyGravity::Simulate(UINT threadIndex)
     ID3D12DescriptorHeap* ppHeaps[] = { m_srvUavHeap.Get() };
     pCommandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-    
+    CD3DX12_GPU_DESCRIPTOR_HANDLE uavHandleGpu(m_srvUavHeap->GetGPUDescriptorHandleForHeapStart(), uavIndex + threadIndex, m_srvUavDescriptorSize);
+    CD3DX12_CPU_DESCRIPTOR_HANDLE uavHandleCPU(m_srvUavHeap->GetCPUDescriptorHandleForHeapStart(), uavIndex + threadIndex, m_srvUavDescriptorSize);
+    FLOAT values[4] = { 1,1,1,1 };
+
+    debug("uavHandleCPU.ptr", uavHandleCPU.ptr);
+    pCommandList->ClearUnorderedAccessViewFloat(uavHandleGpu, uavHandleCPU, pUavResource, values, 0, nullptr);
+
 
     CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandle(m_srvUavHeap->GetGPUDescriptorHandleForHeapStart(), srvIndex + threadIndex, m_srvUavDescriptorSize);
     CD3DX12_GPU_DESCRIPTOR_HANDLE uavHandle(m_srvUavHeap->GetGPUDescriptorHandleForHeapStart(), uavIndex + threadIndex, m_srvUavDescriptorSize);
